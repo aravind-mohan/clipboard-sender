@@ -13,11 +13,11 @@ public class Main
 		// Get the host and ports from the command-line
 		if (args.length != 3)
 		{
-			printUsage();
+			printUsageAndExit();
 		}
 		else if ( ! (args[0].matches("^\\d+$") && args[2].matches("^\\d+$")) )
 		{
-			printUsage();
+			printUsageAndExit();
 		}
 		
 		int localServerPort = Integer.parseInt(args[0]);
@@ -33,9 +33,11 @@ public class Main
 				CLIPBOARD_POLLER_FIXED_DELAY, TimeUnit.SECONDS);
 	}
 	
-	private static void printUsage()
+	private static void printUsageAndExit()
 	{
 		System.out.println("USAGE: java " + Main.class.getName()
 				+ " <local_server_port> <remote_server_host> <remote_server_port>");
+		
+		System.exit(1);
 	}
 }

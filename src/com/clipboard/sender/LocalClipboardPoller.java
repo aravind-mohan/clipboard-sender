@@ -28,6 +28,8 @@ public class LocalClipboardPoller implements Runnable
 			{
 				// Send the new clipboard contents to the remote server
 				ClipboardUtils.setRemoteClipboardContents(localClipboardContents, remoteServerHost, remoteServerPort);
+				
+				previousLocalClipboardContents = localClipboardContents;
 			}
 		}
 		catch(Throwable t)
