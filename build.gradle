@@ -1,0 +1,16 @@
+apply plugin: "java"
+
+task run(type: JavaExec)
+{
+	classpath = sourceSets.main.runtimeClasspath
+	
+	main = "com.clipboard.sender.Main"
+	
+	if (project.hasProperty("appArgs"))
+	{
+		args(appArgs.split(" ");
+	}
+}
+
+run.dependsOn "clean" "build"
+build.mustRunAfter "clean"
