@@ -17,7 +17,8 @@ public class AppTerminator implements Runnable
 	{
 		if (Files.exists(Paths.get(terminatorFile)))
 		{
-			System.exit(1);
+			System.out.println("INFO: Found " + terminatorFile + ". Closing the application...");
+			System.exit(0);
 		}
 	}
 }

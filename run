@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ $# -eq 0 ]
+then
+	echo "USAGE: $0 <args>"
+else
+	./gradlew --no-daemon run -PappArgs="$*"
+fi
+
+
+
