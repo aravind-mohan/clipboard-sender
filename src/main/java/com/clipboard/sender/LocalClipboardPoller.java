@@ -11,6 +11,8 @@ public class LocalClipboardPoller implements Runnable
 	{
 		this.remoteServerHost = remoteServerHost;
 		this.remoteServerPort = remoteServerPort;
+		
+		System.out.println("INFO: Local clipboard poller started...");
 	}
 	
 	@Override

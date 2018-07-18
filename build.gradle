@@ -5,13 +5,15 @@ task run(type: JavaExec) {
 	
 	main = "com.clipboard.sender.Main"
 	
-	if (project.hasProperty("appArgs")) {
+	if ( ! project.hasProperty("appArgs")) {
+		throw new InvalidUserDataException("-PappArgs=\"<args>\" is mandatory!!!")
+	} else {
 		args(appArgs.split(" "))
 	}
 }
 
-run.dependsOn "clean" "classes"
-"classes".mustRunAfter "clean"
+run.dependsOn clean, build
+build.mustRunAfter clean
 
 defaultTasks "run"
 

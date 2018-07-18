@@ -23,6 +23,8 @@ public class RemoteClipboardServer implements Runnable
 			// Start listening on port
 			serverSocket = new ServerSocket(localServerPort, 1);
 			
+			System.out.println("INFO: Remote clipboard server started...");
+			
 			// Continuously listen for requests
 			while (true)
 			{
@@ -69,7 +71,11 @@ public class RemoteClipboardServer implements Runnable
 				serverSocket.close();
 			}
 			catch(Throwable t)
-			{}
+			{
+				t.printStackTrace();
+			}
 		}
+		
+		System.out.println("INFO: Remote clipboard server stopped...");
 	}
 }

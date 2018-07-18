@@ -1,5 +1,9 @@
 package com.clipboard.sender;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -7,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 public class Main
 {
 	private static final int CLIPBOARD_POLLER_FIXED_DELAY = 1;
+	private static final int TERMINATOR_FILE_FINDER_FIXED_DELAY = 2;
+	private static final String TERMINATOR_FILE = ".terminate";
 	
 	public static void main(String[] args)
 	{
@@ -24,13 +30,31 @@ public class Main
 		String remoteServerHost = args[1];
 		int remoteServerPort = Integer.parseInt(args[2]);
 		
+		// Remove the "terminator" file
+		try
+		{
+			Files.deleteIfExists(Paths.get(TERMINATOR_FILE));
+		}
+		catch (IOException e)
+		{}
+		
 		// Start the remote clipboard listener
-		Executors.newSingleThreadExecutor().execute(new RemoteClipboardServer(localServerPort));
+		ExecutorService remoteClipboardService = Executors.newSingleThreadExecutor();
+		remoteClipboardService.execute(new RemoteClipboardServer(localServerPort));
 		
 		// Start the local clipboard listener on a schedule
-		ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
-		scheduledExecutorService.scheduleWithFixedDelay(new LocalClipboardPoller(remoteServerHost, remoteServerPort), 0,
+		ScheduledExecutorService localClipboardPollerService = Executors.newSingleThreadScheduledExecutor();
+		localClipboardPollerService.scheduleWithFixedDelay(new LocalClipboardPoller(remoteServerHost, remoteServerPort), 0,
 				CLIPBOARD_POLLER_FIXED_DELAY, TimeUnit.SECONDS);
+		
+		// Start the thread which looks for the "terminator" file
+		ScheduledExecutorService threadTerminatorService = Executors.newSingleThreadScheduledExecutor();
+		
+		threadTerminatorService.scheduleWithFixedDelay(
+				new AppTerminator(TERMINATOR_FILE), 
+				0,
+				TERMINATOR_FILE_FINDER_FIXED_DELAY, 
+				TimeUnit.SECONDS);
 	}
 	
 	private static void printUsageAndExit()
