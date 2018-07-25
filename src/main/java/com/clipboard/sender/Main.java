@@ -8,8 +8,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class Main
 {
+	private static final Logger LOGGER = LogManager.getLogger(Main.class);
+	
 	private static final int CLIPBOARD_POLLER_FIXED_DELAY = 1;
 	private static final int TERMINATOR_FILE_FINDER_FIXED_DELAY = 2;
 	private static final String TERMINATOR_FILE = ".terminate";
@@ -21,7 +26,7 @@ public class Main
 		{
 			printUsageAndExit();
 		}
-		else if ( ! (args[0].matches("^\\d+$") && args[2].matches("^\\d+$")) )
+		else if (!(args[0].matches("^\\d+$") && args[2].matches("^\\d+$")))
 		{
 			printUsageAndExit();
 		}
@@ -36,7 +41,9 @@ public class Main
 			Files.deleteIfExists(Paths.get(TERMINATOR_FILE));
 		}
 		catch (IOException e)
-		{}
+		{
+			LOGGER.fatal(e.getMessage(), e);
+		}
 		
 		// Start the remote clipboard listener
 		ExecutorService remoteClipboardService = Executors.newSingleThreadExecutor();
@@ -44,22 +51,19 @@ public class Main
 		
 		// Start the local clipboard listener on a schedule
 		ScheduledExecutorService localClipboardPollerService = Executors.newSingleThreadScheduledExecutor();
-		localClipboardPollerService.scheduleWithFixedDelay(new LocalClipboardPoller(remoteServerHost, remoteServerPort), 0,
-				CLIPBOARD_POLLER_FIXED_DELAY, TimeUnit.SECONDS);
+		localClipboardPollerService.scheduleWithFixedDelay(new LocalClipboardPoller(remoteServerHost, remoteServerPort),
+				0, CLIPBOARD_POLLER_FIXED_DELAY, TimeUnit.SECONDS);
 		
 		// Start the thread which looks for the "terminator" file
 		ScheduledExecutorService threadTerminatorService = Executors.newSingleThreadScheduledExecutor();
 		
-		threadTerminatorService.scheduleWithFixedDelay(
-				new AppTerminator(TERMINATOR_FILE), 
-				0,
-				TERMINATOR_FILE_FINDER_FIXED_DELAY, 
-				TimeUnit.SECONDS);
+		threadTerminatorService.scheduleWithFixedDelay(new AppTerminator(TERMINATOR_FILE), 0,
+				TERMINATOR_FILE_FINDER_FIXED_DELAY, TimeUnit.SECONDS);
 	}
 	
 	private static void printUsageAndExit()
 	{
-		System.out.println("USAGE: java " + Main.class.getName()
+		LOGGER.error("USAGE: java " + Main.class.getName()
 				+ " <local_server_port> <remote_server_host> <remote_server_port>");
 		
 		System.exit(1);

@@ -4,8 +4,13 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class RemoteClipboardServer implements Runnable
 {
+	private static final Logger LOGGER = LogManager.getLogger(RemoteClipboardServer.class);
+	
 	private int localServerPort;
 	
 	public RemoteClipboardServer(int serverPort)
@@ -23,7 +28,7 @@ public class RemoteClipboardServer implements Runnable
 			// Start listening on port
 			serverSocket = new ServerSocket(localServerPort, 1);
 			
-			System.out.println("INFO: Remote clipboard server started...");
+			LOGGER.info("Remote clipboard server started...");
 			
 			// Continuously listen for requests
 			while (true)
@@ -47,14 +52,18 @@ public class RemoteClipboardServer implements Runnable
 					reader.close();
 				}
 				catch(Throwable t)
-				{}
+				{
+					LOGGER.warn(t.getMessage(), t);
+				}
 				
 				try
 				{
 					socket.close();
 				}
 				catch(Throwable t)
-				{}
+				{
+					LOGGER.warn(t.getMessage(), t);
+				}
 				
 				// Set the clipboard with those contents
 				ClipboardUtils.setLocalClipboardContents(stringBuilder.toString());
@@ -62,7 +71,7 @@ public class RemoteClipboardServer implements Runnable
 		}
 		catch (Throwable t)
 		{
-			t.printStackTrace();
+			LOGGER.error(t.getMessage(), t);
 		}
 		finally
 		{
@@ -72,10 +81,10 @@ public class RemoteClipboardServer implements Runnable
 			}
 			catch(Throwable t)
 			{
-				t.printStackTrace();
+				LOGGER.warn(t.getMessage(), t);
 			}
 		}
 		
-		System.out.println("INFO: Remote clipboard server stopped...");
+		LOGGER.info("Remote clipboard server stopped...");
 	}
 }

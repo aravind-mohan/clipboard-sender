@@ -1,7 +1,12 @@
 package com.clipboard.sender;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class LocalClipboardPoller implements Runnable
 {
+	private static final Logger LOGGER = LogManager.getLogger(LocalClipboardPoller.class);
+	
 	private static String previousLocalClipboardContents = null;
 	
 	private String remoteServerHost;
@@ -12,7 +17,7 @@ public class LocalClipboardPoller implements Runnable
 		this.remoteServerHost = remoteServerHost;
 		this.remoteServerPort = remoteServerPort;
 		
-		System.out.println("INFO: Local clipboard poller started...");
+		LOGGER.info("Local clipboard poller started...");
 	}
 	
 	@Override
@@ -36,7 +41,7 @@ public class LocalClipboardPoller implements Runnable
 		}
 		catch(Throwable t)
 		{
-			t.printStackTrace();
+			LOGGER.error(t.getMessage(), t);
 		}
 	}
 }

@@ -3,8 +3,13 @@ package com.clipboard.sender;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class AppTerminator implements Runnable
 {
+	private static final Logger LOGGER = LogManager.getLogger(AppTerminator.class);
+	
 	private String terminatorFile;
 	
 	public AppTerminator(String terminatorFile)
@@ -17,7 +22,7 @@ public class AppTerminator implements Runnable
 	{
 		if (Files.exists(Paths.get(terminatorFile)))
 		{
-			System.out.println("INFO: Found " + terminatorFile + ". Closing the application...");
+			LOGGER.info("Found " + terminatorFile + " file. Closing the application...");
 			System.exit(0);
 		}
 	}

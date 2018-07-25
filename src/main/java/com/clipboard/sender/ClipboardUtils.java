@@ -7,8 +7,13 @@ import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class ClipboardUtils
 {
+	private static final Logger LOGGER = LogManager.getLogger(ClipboardUtils.class);
+	
 	public static String getLocalClipboardContents() throws Throwable
 	{
 		Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -46,8 +51,11 @@ public class ClipboardUtils
 				String cmd2 = "echo -n '" + clipboardContents + "' | xsel -is";
 				String cmd3 = "echo -n '" + clipboardContents + "' | xsel -ib";
 				
+				LOGGER.info("Executing " + cmd1);
 				Runtime.getRuntime().exec(cmd1);
+				LOGGER.info("Executing " + cmd2);
 				Runtime.getRuntime().exec(cmd2);
+				LOGGER.info("Executing " + cmd3);
 				Runtime.getRuntime().exec(cmd3);
 			}
 			else if (operatingSystem.contains("Windows"))
@@ -73,13 +81,17 @@ public class ClipboardUtils
 			writer.close();
 		}
 		catch(Throwable t)
-		{}
+		{
+			LOGGER.warn(t.getMessage(), t);
+		}
 		
 		try
 		{
 			socket.close();
 		}
 		catch(Throwable t)
-		{}
+		{
+			LOGGER.warn(t.getMessage(), t);
+		}
 	}
 }
